@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        display: grid;
+        justify-content: center;
+        padding: 10rem;
+      }
+      #GameBoard {
+        aspect-ratio: 1/1;
+        display: grid;
+        grid-template-columns: repeat(3, 10rem);
+        grid-template-rows: repeat(3, 10rem);
+        background: #000000;
+        gap: 1rem;
+        caret-color: transparent;
+      }
+      .fields {
+        background: #775656;
+        display: grid;
+        place-content: center;
+        font-size: 9rem;
+      }
+      #start-button {
+        margin-top: 2rem;
+        font-size: 1.5rem;
+        width: 50%;
+        justify-self: center;
+      }
+      #result {
+        display: grid;
+        place-content: center;
+        font-size: 2rem;
+        height: 2rem;
+        border-bottom: 1px solid #000000;
+      }
+      p {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 900;
+        margin: 0;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="margin-bottom: 2rem">
+      <p>Player one: O</p>
+      <p>Player two: X</p>
+    </div>
+    <div id="GameBoard"></div>
+    <p>Result:</p>
+    <div id="result"></div>
+    <button id="start-button">Start New Game</button>
+    <script>
+      const playerOne = { sign: "O", name: "Player one" };
+      const playerTwo = { sign: "X", name: "Player two" };
+      const gameBoard = document.querySelector("#GameBoard");
+      const result = document.querySelector("#result");
+      const newGameButton = document.querySelector("#start-button");
+      currentPlayer = playerOne;
+      let fields = [];
+
+      const winConditions = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+        [1, 4, 7],
+        [2, 5, 8],
+        [3, 6, 9],
+        [1, 5, 9],
+        [3, 5, 7],
+      ];
+
+      function drawField() {
+        for (let i = 0; i < 9; i++) {
+          let newField = document.createElement("div");
+          newField.classList.add("fields");
+          gameBoard.appendChild(newField);
+          fields.push(newField);
+        }
+      }
+
+      function addXOrOToTheFields(field) {
+        if (
+          field.target.classList.contains("fields") &&
+          field.target.innerText === ""
+        ) {
+          field.target.innerText = currentPlayer.sign;
+        }
+        testIfSomeoneHasWonOrDraw();
+        if (currentPlayer === playerTwo) {
+          currentPlayer = playerOne;
+        } else {
+          currentPlayer = playerTwo;
+        }
+      }
+
+      function testIfSomeoneHasWonOrDraw() {
+        //test if its a draw
+        let test = 0;
+        for (let i = 0; i < fields.length; i++) {
+          if (fields[i].innerText !== "") {
+            test++;
+          }
+        }
+        if (test === fields.length) {
+          result.innerText = `It's a draw!`;
+          gameBoard.removeEventListener("click", addXOrOToTheFields);
+        }
+        //test if someone has won
+        for (let i = 0; i < winConditions.length; i++) {
+          condition = winConditions[i];
+          if (
+            fields[condition[0] - 1].innerText ===
+              fields[condition[1] - 1].innerText &&
+            fields[condition[0] - 1].innerText ===
+              fields[condition[2] - 1].innerText &&
+            fields[condition[0] - 1].innerText !== ""
+          ) {
+            result.innerText = `${currentPlayer.name} has won!`;
+            gameBoard.removeEventListener("click", addXOrOToTheFields);
+          }
+        }
+      }
+
+      function resetFields() {
+        result.innerText = "";
+        gameBoard.addEventListener("click", addXOrOToTheFields);
+        for (i = 0; i < fields.length; i++) {
+          fields[i].innerText = "";
+        }
+        currentPlayer = playerOne;
+      }
+
+      newGameButton.addEventListener("click", resetFields);
+
+      drawField();
+
+      gameBoard.addEventListener("click", addXOrOToTheFields);
+    </script>
+  </body>
+</html>
